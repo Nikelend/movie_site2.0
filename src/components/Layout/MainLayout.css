@@ -1,0 +1,22 @@
+.site-layout {
+  min-height: 100vh;
+}
+
+.site-header {
+  padding: 0;
+  background: var(--bg-color);
+}
+
+.sidebar-toggle-btn {
+  font-size: 16px;
+  width: 64px;
+  height: 64px;
+}
+
+.site-content {
+  margin: 24px 16px;
+  padding: 24px;
+  min-height: 280px;
+  border-radius: var(--border-radius);
+  background: var(--bg-color);
+}

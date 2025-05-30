@@ -1,0 +1,45 @@
+.actors-page {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+}
+
+.actors-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.actor-card {
+  width: 150px;
+  text-align: center;
+}
+
+.actor-image {
+  border-radius: 8px;
+  width: 100%;
+  height: auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+.search-input {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 20px;
+  border-radius: 30px; 
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #1890ff; 
+  transition: all 0.3s ease; 
+}
+
+.search-input:focus {
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.5); 
+  border-color: #1890ff; 
+}
+
+.search-input .ant-input-prefix {
+  color: #1890ff; 
+}
