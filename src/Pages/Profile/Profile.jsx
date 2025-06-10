@@ -9,8 +9,8 @@ export default function Profile() {
   const [ratedMovies, setRatedMovies] = useState([]);
   const [favoriteMovies, setFavoriteMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const scrollContainerRef = useRef(null);
-  const scrollFavoriteRef = useRef(null); 
+  const scrollRatedRef = useRef(null);
+  const scrollFavoriteRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,14 +58,9 @@ export default function Profile() {
 
     fetchAll();
 
-    const handleStorageUpdate = () => {
-      fetchAll();
-    };
-
+    const handleStorageUpdate = () => fetchAll();
     window.addEventListener("storageUpdated", handleStorageUpdate);
-    return () => {
-      window.removeEventListener("storageUpdated", handleStorageUpdate);
-    };
+    return () => window.removeEventListener("storageUpdated", handleStorageUpdate);
   }, []);
 
   const scroll = (ref, direction) => {
@@ -80,94 +75,68 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="profile-loader">
-        <Spin tip="Завантаження..." />
+        <Spin tip="Завантаження..." size="large" />
       </div>
     );
   }
 
+  const renderCard = (movie, showRating = false) => (
+    <Card
+      key={movie.id}
+      title={`${movie.title} (${movie.release_date?.slice(0, 4)})`}
+      cover={
+        <img
+          alt={movie.title}
+          src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+        />
+      }
+      className="profile-movie-card"
+      onClick={() =>
+        navigate(`/movie-details/${movie.id}`, {
+          state: {
+            title: movie.title,
+            year: movie.release_date?.slice(0, 4),
+            summary: movie.overview,
+            poster: `https://image.tmdb.org/t/p/w300${movie.poster_path}`,
+            genres: movie.genres || [],
+            rating: movie.vote_average,
+            cast: movie.cast,
+          },
+        })
+      }
+    >
+      <p>{movie.overview}</p>
+      {showRating && (
+        <div>
+          <strong>Моя оцінка:</strong> <Rate disabled value={movie.userRating} allowHalf />
+        </div>
+      )}
+    </Card>
+  );
+
   return (
     <section className="profile-container">
-      <h2>Мої оцінені фільми</h2>
+      <h2>Мої оцінені фільми ({ratedMovies.length})</h2>
       {ratedMovies.length === 0 ? (
         <p>Ви ще не оцінили жодного фільму.</p>
       ) : (
         <div className="profile-carousel-wrapper">
-          <Button icon={<LeftOutlined />} onClick={() => scroll(scrollContainerRef, "left")} />
-          <div className="profile-movies" ref={scrollContainerRef}>
-            {ratedMovies.map((movie) => (
-              <Card
-                key={movie.id}
-                title={`${movie.title} (${movie.release_date?.slice(0, 4)})`}
-                cover={
-                  <img
-                    alt={movie.title}
-                    src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-                  />
-                }
-                className="profile-movie-card"
-                style={{ cursor: "pointer" }}
-                onClick={() =>
-                  navigate(`/movie-details/${movie.id}`, {
-                    state: {
-                      title: movie.title,
-                      year: movie.release_date?.slice(0, 4),
-                      summary: movie.overview,
-                      poster: `https://image.tmdb.org/t/p/w300${movie.poster_path}`,
-                      genres: movie.genres || [],
-                      rating: movie.vote_average,
-                      cast: movie.cast,
-                    },
-                  })
-                }
-              >
-                <p>{movie.overview}</p>
-                <p>
-                  <strong>Моя оцінка:</strong>{" "}
-                  <Rate disabled value={movie.userRating} allowHalf />
-                </p>
-              </Card>
-            ))}
+          <Button icon={<LeftOutlined />} onClick={() => scroll(scrollRatedRef, "left")} />
+          <div className="profile-movies" ref={scrollRatedRef}>
+            {ratedMovies.map((movie) => renderCard(movie, true))}
           </div>
-          <Button icon={<RightOutlined />} onClick={() => scroll(scrollContainerRef, "right")} />
+          <Button icon={<RightOutlined />} onClick={() => scroll(scrollRatedRef, "right")} />
         </div>
       )}
 
-      <h2>Мої улюблені фільми</h2>
+      <h2>Мої улюблені фільми ({favoriteMovies.length})</h2>
       {favoriteMovies.length === 0 ? (
         <p>Ви ще не додали фільмів в улюблені.</p>
       ) : (
         <div className="profile-carousel-wrapper">
           <Button icon={<LeftOutlined />} onClick={() => scroll(scrollFavoriteRef, "left")} />
           <div className="profile-movies" ref={scrollFavoriteRef}>
-            {favoriteMovies.map((movie) => (
-              <Card
-                key={movie.id}
-                title={`${movie.title} (${movie.release_date?.slice(0, 4)})`}
-                cover={
-                  <img
-                    alt={movie.title}
-                    src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-                  />
-                }
-                className="profile-movie-card"
-                style={{ cursor: "pointer" }}
-                onClick={() =>
-                  navigate(`/movie-details/${movie.id}`, {
-                    state: {
-                      title: movie.title,
-                      year: movie.release_date?.slice(0, 4),
-                      summary: movie.overview,
-                      poster: `https://image.tmdb.org/t/p/w300${movie.poster_path}`,
-                      genres: movie.genres || [],
-                      rating: movie.vote_average,
-                      cast: movie.cast,
-                    },
-                  })
-                }
-              >
-                <p>{movie.overview}</p>
-              </Card>
-            ))}
+            {favoriteMovies.map((movie) => renderCard(movie))}
           </div>
           <Button icon={<RightOutlined />} onClick={() => scroll(scrollFavoriteRef, "right")} />
         </div>
